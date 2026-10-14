@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGCSE ICT - OMR & OCR Quiz (Shuffled Answers)</title>
+    <style>
+        :root {
+            --bg-main: #090d16;
+            --bg-card: #131d31;
+            --border-color: #223354;
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        header h1 {
+            color: var(--accent);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .quiz-status {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .score-pill {
+            background-color: #0c4a6e;
+            color: #7dd3fc;
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid #0284c7;
+        }
+
+        .card {
+            width: 100%;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            background-color: #1e293b;
+            color: var(--text-main);
+            padding: 1rem 1.25rem;
+            border-radius: 0.85rem;
+            border: 1px solid #334155;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #283548;
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .option-btn.correct {
+            background-color: #064e3b !important;
+            border-color: #059669 !important;
+            color: #ecfdf5 !important;
+        }
+
+        .option-btn.incorrect {
+            background-color: #7f1d1d !important;
+            border-color: #dc2626 !important;
+            color: #fee2e2 !important;
+        }
+
+        .feedback-box {
+            padding: 1.15rem;
+            border-radius: 0.85rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .feedback-box.correct-feedback {
+            background-color: #022c22;
+            border: 1px solid #047857;
+            color: #a7f3d0;
+        }
+
+        .feedback-box.incorrect-feedback {
+            background-color: #450a0a;
+            border: 1px solid #b91c1c;
+            color: #fecdd3;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: #0f172a;
+            font-weight: 700;
+            padding: 0.85rem 1.75rem;
+            border-radius: 0.85rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .results-card {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .results-card h2 {
+            font-size: 2.25rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .results-card p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        footer {
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>IGCSE ICT Practice Quiz</h1>
+        <p>Topics 2.2.3 OMR & 2.2.4 OCR (Direct Data Entry Devices)</p>
+    </header>
+
+    <main>
+        <div class="quiz-status">
+            <span id="question-counter">Question 1 of 30</span>
+            <span id="score-display" class="score-pill">Score: 0</span>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="card">
+            <div id="question-box" class="question-text">
+                Loading question...
+            </div>
+
+            <div id="options-container" class="options-list">
+                <!-- Options populated dynamically -->
+            </div>
+
+            <div id="feedback-box" class="feedback-box hidden">
+                <!-- Feedback populated dynamically -->
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <button id="next-btn" onclick="nextQuestion()" class="btn-primary hidden">Next Question</button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="results-container" class="card results-card hidden">
+            <h2>Quiz Completed! 🎉</h2>
+            <p id="final-score">You scored X out of 30</p>
+            <button onclick="restartQuiz()" class="btn-primary">Restart Quiz</button>
+        </div>
+    </main>
+
+    <footer>
+        IGCSE ICT Revision &bull; Direct Data Entry (OMR & OCR)
+    </footer>
+
+    <script>
+        const questions = [
+            // OMR Questions (1 to 15)
+            {
+                question: "What does the acronym OMR stand for in computer data entry?",
+                options: [
+                    { text: "Optical Mark Recognition (or Optical Mark Reader)", isCorrect: true, rationale: "OMR stands for Optical Mark Recognition, used to read shaded pencil marks on paper forms." },
+                    { text: "Online Magnetic Registration", isCorrect: false, rationale: "This is incorrect terminology." },
+                    { text: "Optical Machine Resolution", isCorrect: false, rationale: "This is incorrect." },
+                    { text: "Original Monochromatic Renderer", isCorrect: false, rationale: "This is incorrect." }
+                ]
+            },
+            {
+                question: "How does an Optical Mark Recognition (OMR) system detect and read user responses on a paper form?",
+                options: [
+                    { text: "By shining a light beam onto the paper and measuring reflection; shaded pencil marks reflect less light than blank paper", isCorrect: true, rationale: "OMR detectors sense lower light reflection where dark pencil graphite fills in designated bubbles or boxes." },
+                    { text: "By using magnetic read heads to feel metal particles embedded in ink", isCorrect: false, rationale: "This describes magnetic stripe or MICR reading." },
+                    { text: "By receiving wireless radio frequency signals from microchips inside the paper", isCorrect: false, rationale: "This is RFID technology." },
+                    { text: "By translating character shapes into editable words using neural networks", isCorrect: false, rationale: "This describes OCR, not OMR." }
+                ]
+            },
+            {
+                question: "What is a classic, real-world application of OMR technology?",
+                options: [
+                    { text: "Marking multiple-choice examination answer sheets, lottery tickets, and customer survey questionnaires", isCorrect: true, rationale: "OMR is widely used for automated multiple-choice exam scoring and lottery betting slips." },
+                    { text: "Printing architectural blueprints onto large paper rolls", isCorrect: false, rationale: "Blueprints are printed by plotters." },
+                    { text: "Swiping hotel room key cards at doorway locks", isCorrect: false, rationale: "Hotel keys use magnetic stripes or RFID." },
+                    { text: "Recording continuous temperature readings in an agricultural greenhouse", isCorrect: false, rationale: "Greenhouses use environmental sensors." }
+                ]
+            },
+            {
+                question: "What is a major advantage of using OMR for processing multiple-choice school exams?",
+                options: [
+                    { text: "Extremely high processing speed and accuracy compared to manual human teacher grading", isCorrect: true, rationale: "OMR can process thousands of exam papers per hour accurately without human fatigue or marking errors." },
+                    { text: "It allows students to write long, detailed paragraph essays instead of shading bubbles", isCorrect: false, rationale: "OMR only reads shaded marks, not handwritten essays." },
+                    { text: "It completely eliminates the need for paper answer sheets", isCorrect: false, rationale: "OMR requires specially formatted paper forms." },
+                    { text: "It allows wireless Bluetooth streaming to student smartphones", isCorrect: false, rationale: "OMR is a physical paper scanning process." }
+                ]
+            },
+            {
+                question: "What is a major disadvantage or limitation of OMR forms?",
+                options: [
+                    { text: "Forms must be precisely filled out and aligned; stray marks, folded corners, or incorrect shading can cause reading errors", isCorrect: true, rationale: "OMR requires strict form alignment and correct pencil shading; folding or stray marks lead to rejection or misreading." },
+                    { text: "OMR readers require built-in nuclear battery power packs to operate", isCorrect: false, rationale: "OMR machines plug into standard mains power." },
+                    { text: "OMR forms cannot be printed on paper media", isCorrect: false, rationale: "OMR forms are printed on specialized paper." },
+                    { text: "OMR technology can only process one single form per calendar year", isCorrect: false, rationale: "OMR processes thousands of forms rapidly." }
+                ]
+            },
+            {
+                question: "Why must OMR forms be printed with precise alignment marks (timing tracks/registration marks)?",
+                options: [
+                    { text: "To allow the OMR scanner to calibrate its grid coordinates and ensure it reads each response box in the correct position", isCorrect: true, rationale: "Alignment marks guide the optical scanner to map exact bubble coordinates accurately across the page." },
+                    { text: "To make the paper smell pleasant for students taking exams", isCorrect: false, rationale: "Alignment marks have no scent." },
+                    { text: "To encrypt the exam paper using quantum cryptography", isCorrect: false, rationale: "Alignment marks are visual reference lines." },
+                    { text: "To prevent the paper from catching fire inside the scanner", isCorrect: false, rationale: "This is false." }
+                ]
+            },
+            {
+                question: "What happens if a student shades an OMR bubble too lightly or uses an incorrect pen color (like red ink instead of dark pencil)?",
+                options: [
+                    { text: "The OMR scanner may fail to detect the mark, resulting in an unanswered or incorrect question grade", isCorrect: true, rationale: "OMR sensors look for a specific drop in light reflection; faint marks or non-readable ink colors are missed." },
+                    { text: "The OMR machine automatically awards full bonus marks to the student", isCorrect: false, rationale: "The scanner simply records no mark." },
+                    { text: "The computer system prints out a warning certificate", isCorrect: false, rationale: "This does not occur." },
+                    { text: "The paper form transforms into a digital holographic 3D model", isCorrect: false, rationale: "This is sci-fi fiction." }
+                ]
+            },
+            {
+                question: "Why are HB pencils usually specified for filling in OMR answer sheets?",
+                options: [
+                    { text: "HB graphite pencils provide the correct darkness and density of carbon required to reflect light poorly, ensuring reliable scanner detection", isCorrect: true, rationale: "Graphite from HB pencils creates a dark, opaque mark that reliably drops light reflection for OMR sensors." },
+                    { text: "HB pencils contain radioactive isotopes that light up scanner screens", isCorrect: false, rationale: "Pencils are non-radioactive." },
+                    { text: "HB pencils can be erased easily by the OMR scanner's internal laser eraser", isCorrect: false, rationale: "Scanners do not erase marks." },
+                    { text: "HB pencils are the only pencils legally manufactured on Earth", isCorrect: false, rationale: "Many pencil grades exist." }
+                ]
+            },
+            {
+                question: "In what scenario would OMR be preferred over keyboard data entry?",
+                options: [
+                    { text: "When gathering survey feedback or exam results from thousands of participants quickly without paying data-entry operators to type responses", isCorrect: true, rationale: "OMR automates mass form processing instantly, saving immense labor time and typing costs compared to manual entry." },
+                    { text: "When writing a 500-page academic thesis with custom paragraph formatting", isCorrect: false, rationale: "Theses require keyboards and word processors." },
+                    { text: "When browsing e-commerce shopping websites on a smartphone", isCorrect: false, rationale: "Web browsing requires touchscreens and browsers." },
+                    { text: "When playing high-speed 3D flight simulation games", isCorrect: false, rationale: "Games require joysticks or keyboards." }
+                ]
+            },
+            {
+                question: "What is a limitation of OMR regarding the type of data it can capture?",
+                options: [
+                    { text: "It can only capture predefined categorical choices (like selecting A, B, C, or D), not complex descriptive text or opinions", isCorrect: true, rationale: "OMR is strictly limited to reading predetermined shaded marks on a template grid." },
+                    { text: "It can capture high-definition streaming video files", isCorrect: false, rationale: "OMR processes flat paper forms only." },
+                    { text: "It can record live musical voice performances", isCorrect: false, rationale: "Audio recording requires microphones." },
+                    { text: "It can measure room temperature accurately", isCorrect: false, rationale: "Temperature is measured by sensors." }
+                ]
+            },
+            {
+                question: "How do lottery organizations utilize OMR technology during ticket processing?",
+                options: [
+                    { text: "Players shade numbers on a paper play slip, which is scanned via OMR at retail terminals to register their chosen lottery numbers", isCorrect: true, rationale: "OMR scans players' marked number selections on paper betting slips instantly." },
+                    { text: "Players speak their winning numbers into a microphone connected to an OMR reader", isCorrect: false, rationale: "Voice uses speech recognition." },
+                    { text: "Lottery tickets are printed with active RFID microchips that explode after the draw", isCorrect: false, rationale: "This is incorrect." },
+                    { text: "Lottery machines use magnetic stripe cards swiped on paper", isCorrect: false, rationale: "This is incorrect." }
+                ]
+            },
+            {
+                question: "What happens if an OMR form gets crumpled, folded, or stained with coffee before being scanned?",
+                options: [
+                    { text: "The paper may jam inside the scanner transport mechanism or cause reading errors due to distorted mark alignment", isCorrect: true, rationale: "Damaged or stained paper disrupts light reflection and alignment tracks, often jamming the machine or causing rejected forms." },
+                    { text: "The OMR scanner automatically repairs the paper using laser welding", isCorrect: false, rationale: "Scanners cannot repair physical paper damage." },
+                    { text: "The form's data values double automatically", isCorrect: false, rationale: "This does not happen." },
+                    { text: "The computer screen turns off permanently", isCorrect: false, rationale: "This is false." }
+                ]
+            },
+            {
+                question: "Which input device category does an OMR scanner belong to?",
+                options: [
+                    { text: "Direct Data Entry (DDE) devices", isCorrect: true, rationale: "OMR is a direct data entry scanning device that captures paper responses without manual keyboard typing." },
+                    { text: "Manual text entry keyboards", isCorrect: false, rationale: "OMR does not use manual typing." },
+                    { text: "Soft-copy visual output display units", isCorrect: false, rationale: "OMR is an input device, not an output display." },
+                    { text: "Sequential backing storage magnetic tape drives", isCorrect: false, rationale: "This is storage, not input." }
+                ]
+            },
+            {
+                question: "Can an OMR scanner read handwritten text or signature annotations on a paper form?",
+                options: [
+                    { text: "No, OMR can only detect the presence or absence of shaded marks in specific boxes, not handwriting", isCorrect: true, rationale: "OMR is strictly designed for mark detection, not character recognition." },
+                    { text: "Yes, OMR automatically translates handwriting into French and German", isCorrect: false, rationale: "This is incorrect." },
+                    { text: "Yes, OMR converts signatures into vector graphics instantly", isCorrect: false, rationale: "This requires a digital scanner and vector graphics software." },
+                    { text: "OMR turns handwriting into audio files", isCorrect: false, rationale: "This is false." }
+                ]
+            },
+            {
+                question: "Why is OMR considered highly cost-effective for large institutions like universities?",
+                options: [
+                    { text: "It reduces grading labor costs and time significantly by automating thousands of answer sheets per hour", isCorrect: true, rationale: "Automated batch processing reduces the need for large manual grading staffs." },
+                    { text: "It generates free electricity for the entire campus", isCorrect: false, rationale: "OMR machines consume mains electricity." },
+                    { text: "It allows students to skip attending lectures completely", isCorrect: false, rationale: "This is false." },
+                    { text: "It eliminates the need for any computer hardware", isCorrect: false, rationale: "OMR requires specialized hardware scanners and computers." }
+                ]
+            },
+
+            // OCR Questions (16 to 30)
+            {
+                question: "What does the acronym OCR stand for in computer science and ICT?",
+                options: [
+                    { text: "Optical Character Recognition (or Optical Character Reader)", isCorrect: true, rationale: "OCR stands for Optical Character Recognition, used to convert images of text into editable digital characters." },
+                    { text: "Online Cable Routing", isCorrect: false, rationale: "This is incorrect." },
+                    { text: "Optical Color Resolution", isCorrect: false, rationale: "This is incorrect." },
+                    { text: "Original Code Renderer", isCorrect: false, rationale: "This is incorrect." }
+                ]
+            },
+            {
+                question: "How does an Optical Character Recognition (OCR) system process a scanned paper document?",
+                options: [
+                    { text: "It analyzes the shapes of scanned characters pixel by pixel and compares them against stored font templates to convert them into editable text", isCorrect: true, rationale: "OCR software recognizes letter and number shapes, turning a flat image of text into editable ASCII/Unicode text." },
+                    { text: "It measures the heat signature of ink on paper", isCorrect: false, rationale: "OCR analyzes visual shapes, not heat." },
+                    { text: "It reads magnetic ink character patterns using magnetic read heads", isCorrect: false, rationale: "This describes MICR (Magnetic Ink Character Recognition)." },
+                    { text: "It scans radio frequency chips embedded in paper fibers", isCorrect: false, rationale: "This describes RFID." }
+                ]
+            },
+            {
+                question: "What is a primary real-world application of OCR technology?",
+                options: [
+                    { text: "Converting old printed historical books, invoices, or paper documents into editable word processor files", isCorrect: true, rationale: "OCR is widely used for digitizing physical printed documents into searchable, editable text files." },
+                    { text: "Marking multiple-choice student bubble exam papers", isCorrect: false, rationale: "Bubble marking is performed by OMR." },
+                    { text: "Scanning grocery items at supermarket checkout tills", isCorrect: false, rationale: "Supermarkets use barcode scanners." },
+                    { text: "Reading bank account numbers printed with magnetic ink on checks", isCorrect: false, rationale: "Bank checks use MICR." }
+                ]
+            },
+            {
+                question: "What is a major advantage of using OCR to digitize printed documents?",
+                options: [
+                    { text: "The resulting digital text can be easily edited, formatted, searched for keywords, and stored using minimal file space", isCorrect: true, rationale: "Editable text files take up very little space and allow instant keyword searching and word processing." },
+                    { text: "It turns paper documents into physical plastic credit cards", isCorrect: false, rationale: "This is incorrect." },
+                    { text: "It allows documents to be read underwater without a screen", isCorrect: false, rationale: "This is false." },
+                    { text: "It eliminates the need for computer operating systems", isCorrect: false, rationale: "OS is required to run OCR software." }
+                ]
+            },
+            {
+                question: "What is a major disadvantage or limitation of OCR software?",
+                options: [
+                    { text: "It can struggle to recognize unusual fonts, degraded print quality, or messy handwriting, leading to spelling errors", isCorrect: true, rationale: "Poor print quality or non-standard fonts cause OCR software to misinterpret characters, requiring manual proofreading." },
+                    { text: "OCR software requires a nuclear power plant to execute", isCorrect: false, rationale: "OCR runs easily on standard PCs and mobile devices." },
+                    { text: "OCR output files can only be saved in black and white audio format", isCorrect: false, rationale: "OCR produces text files." },
+                    { text: "OCR technology can only process exactly one word per day", isCorrect: false, rationale: "OCR processes thousands of words per second." }
+                ]
+            },
+            {
+                question: "How is OCR used in passport control and automated border e-gates at international airports?",
+                options: [
+                    { text: "To scan the printed text on the passport's data page and instantly verify passenger identity against government databases", isCorrect: true, rationale: "Border e-gates use OCR to read passport text and match it with biometric face scans." },
+                    { text: "To play music videos for travelers waiting in queues", isCorrect: false, rationale: "Passports do not play music." },
+                    { text: "To weigh passenger luggage bags on a digital scale", isCorrect: false, rationale: "Luggage uses pressure sensors." },
+                    { text: "To print paper boarding passes using dot-matrix pins", isCorrect: false, rationale: "Boarding passes are printed by thermal or inkjet printers." }
+                ]
+            },
+            {
+                question: "What is the difference between OCR and OMR?",
+                options: [
+                    { text: "OCR reads and translates character shapes into editable text, whereas OMR only detects the position of shaded marks (bubbles)", isCorrect: true, rationale: "OCR reads letters and words; OMR reads shaded mark positions." },
+                    { text: "OCR uses radio waves, while OMR uses magnetic tape", isCorrect: false, rationale: "Both are optical scanning technologies with different recognition targets." },
+                    { text: "OCR is used for exams, while OMR is used for e-books", isCorrect: false, rationale: "This is reversed; exams use OMR and e-books use OCR digitization." },
+                    { text: "There is no difference between OCR and OMR", isCorrect: false, rationale: "They are distinct technologies." }
+                ]
+            },
+            {
+                question: "How does 'Handwriting OCR' (ICR - Intelligent Character Recognition) differ from standard printed OCR?",
+                options: [
+                    { text: "ICR is advanced software trained to recognize and interpret variable human handwriting styles, whereas standard OCR is designed for machine-printed fonts", isCorrect: true, rationale: "ICR handles complex human handwriting variations, while standard OCR focuses on uniform printed typefaces." },
+                    { text: "ICR can only read barcodes printed on metal plates", isCorrect: false, rationale: "ICR is for handwriting." },
+                    { text: "ICR requires the user to speak aloud into a microphone", isCorrect: false, rationale: "Speech recognition handles spoken audio." },
+                    { text: "ICR is an obsolete technology from 1950", isCorrect: false, rationale: "ICR is modern AI-driven technology." }
+                ]
+            },
+            {
+                question: "Why is proofreading usually necessary after running a degraded historical document through OCR software?",
+                options: [
+                    { text: "Faded ink, torn paper, or stained text can cause OCR misinterpretations (e.g., confusing 'rn' for 'm'), requiring human correction", isCorrect: true, rationale: "Imperfect source documents lead to character recognition errors that need human review." },
+                    { text: "Because OCR software deliberately introduces spelling mistakes for fun", isCorrect: false, rationale: "Errors stem from poor source quality." },
+                    { text: "Because OCR files delete themselves after 24 hours", isCorrect: false, rationale: "Files persist normally." },
+                    { text: "Because printer ink fades when exposed to digital light", isCorrect: false, rationale: "This is false." }
+                ]
+            },
+            {
+                question: "Where is OCR technology utilized by postal services in automated mail sorting centers?",
+                options: [
+                    { text: "To read handwritten or printed delivery addresses on envelopes and sort mail automatically into destination bins", isCorrect: true, rationale: "Postal OCR scanners read zip codes and street addresses to sort mail efficiently at high speeds." },
+                    { text: "To weigh postal parcels on a digital spring scale", isCorrect: false, rationale: "Parcel weighting uses weight sensors." },
+                    { text: "To apply adhesive postage stamps onto envelopes", isCorrect: false, rationale: "Stamp application uses mechanical arms." },
+                    { text: "To freeze mail packages to preserve freshness", isCorrect: false, rationale: "This is incorrect." }
+                ]
+            },
+            {
+                question: "What hardware device is required to capture the initial image of a paper document before OCR software can process it?",
+                options: [
+                    { text: "A scanner or digital camera", isCorrect: true, rationale: "OCR software requires an optical image input (from a flatbed scanner or camera) to analyze character shapes." },
+                    { text: "A laser printer", isCorrect: false, rationale: "Printers produce output, not input." },
+                    { text: "An OMR multiple-choice reader", isCorrect: false, rationale: "OMR readers are specialized for bubble marks." },
+                    { text: "A magnetic stripe swipe terminal", isCorrect: false, rationale: "Magnetic card readers read payment cards." }
+                ]
+            },
+            {
+                question: "What is an advantage of converting paper business cards into digital contact lists using a mobile phone camera and OCR app?",
+                options: [
+                    { text: "Contact details are extracted automatically and saved into phone address books without manual typing", isCorrect: true, rationale: "OCR mobile apps scan business cards and populate contact fields instantly, saving manual typing time." },
+                    { text: "It transforms the business card into a physical gold coin", isCorrect: false, rationale: "This is impossible." },
+                    { text: "It allows the phone to make telephone calls without a battery", isCorrect: false, rationale: "Phones require battery power." },
+                    { text: "It deletes all emails from the inbox", isCorrect: false, rationale: "This is false." }
+                ]
+            },
+            {
+                question: "Which data entry category do both OMR and OCR fall under?",
+                options: [
+                    { text: "Direct Data Entry (DDE) devices", isCorrect: true, rationale: "Both OMR and OCR are direct data entry scanning technologies that bypass slow manual keyboard typing." },
+                    { text: "Manual text entry devices", isCorrect: false, rationale: "They automate data capture rather than relying on manual typing." },
+                    { text: "Soft-copy visual output devices", isCorrect: false, rationale: "They are input scanning systems." },
+                    { text: "Primary volatile memory chips", isCorrect: false, rationale: "This describes RAM." }
+                ]
+            },
+            {
+                question: "Can OCR software recognize text printed in different languages and alphabets (such as Arabic, Chinese, or Cyrillic)?",
+                options: [
+                    { text: "Yes, provided the OCR software has the corresponding language character dictionaries and language packs installed", isCorrect: true, rationale: "Modern OCR supports multilingual recognition using specialized character sets and dictionaries." },
+                    { text: "No, OCR can only ever read English uppercase letters", isCorrect: false, rationale: "OCR supports numerous global languages and scripts." },
+                    { text: "No, OCR only reads musical notes and guitar tabs", isCorrect: false, rationale: "OCR reads text characters." },
+                    { text: "OCR converts all foreign text into binary machine code permanently", isCorrect: false, rationale: "OCR outputs human-readable text characters." }
+                ]
+            },
+            {
+                question: "Which summary best highlights when to choose OCR versus OMR in an ICT scenario?",
+                options: [
+                    { text: "Choose OMR when processing pre-printed multiple-choice shaded mark forms (like exam bubbles); choose OCR when converting images of actual text characters into editable digital documents", isCorrect: true, rationale: "OMR is for shaded marks; OCR is for letters and text characters." },
+                    { text: "Choose OCR for lottery tickets and OMR for historical book digitization", isCorrect: false, rationale: "This is completely reversed; lotteries use OMR and books use OCR." },
+                    { text: "There is no difference; OCR and OMR perform identical tasks", isCorrect: false, rationale: "They serve completely different data capture functions." },
+                    { text: "Both technologies are used exclusively for wireless RFID inventory tracking", isCorrect: false, rationale: "Neither is RFID." }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        const questionCounter = document.getElementById("question-counter");
+        const scoreDisplay = document.getElementById("score-display");
+        const questionBox = document.getElementById("question-box");
+        const optionsContainer = document.getElementById("options-container");
+        const feedbackBox = document.getElementById("feedback-box");
+        const nextBtn = document.getElementById("next-btn");
+        const quizContainer = document.getElementById("quiz-container");
+        const resultsContainer = document.getElementById("results-container");
+        const finalScore = document.getElementById("final-score");
+
+        function loadQuestion() {
+            answered = false;
+            feedbackBox.classList.add("hidden");
+            nextBtn.classList.add("hidden");
+            
+            const q = questions[currentQuestionIndex];
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            scoreDisplay.textContent = `Score: ${score}`;
+            questionBox.textContent = q.question;
+
+            // Shuffle options array randomly so correct answer is not always first
+            let shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            optionsContainer.innerHTML = "";
+            shuffledOptions.forEach((opt) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.textContent = opt.text;
+                btn.onclick = () => selectOption(opt, shuffledOptions);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedOpt, shuffledOptions) {
+            if (answered) return;
+            answered = true;
+
+            const allOptionButtons = optionsContainer.children;
+
+            shuffledOptions.forEach((opt, idx) => {
+                allOptionButtons[idx].disabled = true;
+                if (opt.isCorrect) {
+                    allOptionButtons[idx].classList.add("correct");
+                } else if (opt === selectedOpt && !selectedOpt.isCorrect) {
+                    allOptionButtons[idx].classList.add("incorrect");
+                }
+            });
+
+            feedbackBox.classList.remove("hidden");
+            if (selectedOpt.isCorrect) {
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+                feedbackBox.className = "feedback-box correct-feedback";
+                feedbackBox.innerHTML = `<strong>Correct!</strong> ${selectedOpt.rationale}`;
+            } else {
+                feedbackBox.className = "feedback-box incorrect-feedback";
+                feedbackBox.innerHTML = `<strong>Incorrect.</strong> ${selectedOpt.rationale}`;
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                nextBtn.textContent = "Next Question";
+            } else {
+                nextBtn.textContent = "View Results";
+            }
+            nextBtn.classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                quizContainer.classList.add("hidden");
+                resultsContainer.classList.remove("hidden");
+                finalScore.textContent = `You scored ${score} out of ${questions.length}`;
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            resultsContainer.classList.add("hidden");
+            quizContainer.classList.remove("hidden");
+            loadQuestion();
+        }
+
+        // Initialize quiz on load
+        loadQuestion();
+    </script>
+</body>
+</html>
